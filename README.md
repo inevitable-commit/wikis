@@ -55,7 +55,7 @@ https://en.wikipedia.org/wiki/Arch_Linux_ARM
 ```
 
 # Installation
-For now the installation can only be done using compiling the source code.
+For now the installation can only be done compiling the source code and installing the program using Cargo.
 1. Clone this repo.
 2. Open terminal in the cloned directory and run following command.
 ```
