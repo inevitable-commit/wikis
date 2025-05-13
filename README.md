@@ -18,6 +18,7 @@ Similar to [wikit](https://github.com/KorySchneider/wikit), except with lots of 
 | ----------------------- | ----------------------------------------------- |
 | `--no-link`             | Don't provide the link
 | `--no-summary`          | Don't provide the summary
+| `--lang <LANG>`         | Language edition of Wikipedia to use; defaults to en for English; Language code available at https://en.wikipedia.org/wiki/List_of_Wikipedias#Active_editions |
 | `-c, --choice <CHOICE>` | Index of the topic to choose without prompting |
 | `-h, --help`            | Print help                                      |
 | `-V, --version`         | Print version                                   |
@@ -52,6 +53,14 @@ Arch Linux ARM is a port of Arch Linux for ARM processors. Its design philosophy
 $ wikis --no-summary -c 2 arch linux
 Arch Linux ARM
 https://en.wikipedia.org/wiki/Arch_Linux_ARM
+```
+
+4. Get only the summary in Hindi language.
+```
+$ wikis --no-link --lang hi Sharukh Khan
+Sharukh Khan
+https://hi.wikipedia.org/wiki/Sharukh_Khan
+शाहरख खान, जिनह अकसर  शाह रख खान क रप म शरय दिया जाता ह और अनौपचारिक रप म एस॰आर॰क॰ नाम स सनदरभित किया जाता, यह एक भारतीय फिलम अभिनता ह। अकसर मीडिया म इनह "बॉलीवड का बादशाह", "किग खान", "रोमास किग" और किग ऑफ बॉलीवड नामो स पकारा जाता ह। शाहरख खान न रोमटिक नाटको स लकर ऐकशन थरिलर जसी शलियो म 72 हिनदी फिलमो म अभिनय किया ह। फिलम उदयोग म उनक योगदान क लिय उनहोन तीस नामाकनो म स चौदह फिलमफयर परसकार जीत ह। व और दिलीप कमार ही ऐस दो अभिनता ह जिनहोन फिलमफयर सरवशरषठ अभिनता परसकार 8 बार जीता ह। 2005 म भारत सरकार न उनह भारतीय सिनमा क परति उनक योगदान क लिए पदम शरी स सममानित किया। 2020 म दनिया क सबस अमीर अभिनता मान गए थ
 ```
 
 # Installation

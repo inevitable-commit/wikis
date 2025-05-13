@@ -11,10 +11,10 @@ struct SearchResult {
     links: Vec<String>,
 }
 
-pub fn search(topic: &str) -> (Vec<String>, Vec<String>) {
+pub fn search(lang: &str, topic: &str ) -> (Vec<String>, Vec<String>) {
     let recieved = reqwest::blocking::get(format!(
-        "https://en.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
-        topic
+        "https://{}.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
+        lang, topic
     ))
     .expect("Error when searching for the topic");
 
@@ -29,10 +29,10 @@ struct Summary {
     extract: String,
 }
 
-pub fn summarize(title: &str) -> String {
+pub fn summarize(lang: &str, title: &str) -> String {
     let recieved = reqwest::blocking::get(format!(
-        "https://en.wikipedia.org/api/rest_v1/page/summary/{}",
-        title
+        "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
+        lang, title
     ))
     .expect("Error when getting the summary");
 
@@ -79,7 +79,10 @@ impl TopicSelector for TopicSelectorTerminal {
         if guess.trim().is_empty() {
             Some(0)
         } else {
-            let choice = guess.trim().parse::<i32>().expect("Error parsing the input");
+            let choice = guess
+                .trim()
+                .parse::<i32>()
+                .expect("Error parsing the input");
             if choice > 0 && choice <= topics.len() as i32 {
                 Some(choice as usize - 1)
             } else {
@@ -142,7 +145,6 @@ impl ResultProcessor for Dunst {
             .unwrap();
     }
 }
-
 
 pub struct Terminal;
 

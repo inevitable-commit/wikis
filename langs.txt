@@ -1,0 +1,341 @@
+English en
+French fr
+German de
+Spanish es
+Japanese ja
+Russian ru
+Portuguese pt
+Italian it
+Chinese (writtenvernacular Chinese) zh
+Persian fa
+Polish pl
+Arabic ar
+Dutch nl
+Ukrainian uk
+Hebrew he
+Indonesian id
+Norwegian (Bokmål) no
+Turkish tr
+Romanian ro
+Serbian sr
+Czech cs
+Swedish sv
+Korean ko
+Danish da
+Simple English simple
+Finnish fi
+Hungarian hu
+Vietnamese vi
+Catalan ca
+Bengali bn
+Thai th
+Cantonese zh-yue
+Greek el
+Estonian et
+Swahili sw
+Bulgarian bg
+Hindi hi
+Malay ms
+Basque eu
+Azerbaijani az
+Armenian hy
+Serbo-Croatian sh
+Slovak sk
+Croatian hr
+Uzbek uz
+Lithuanian lt
+Esperanto eo
+Slovene sl
+Georgian ka
+Latvian lv
+Belarusian (officialNarkamaŭka orthography) be
+Galician gl
+Kazakh kk
+Tamil ta
+Albanian sq
+Urdu ur
+Macedonian mk
+Malayalam ml
+Cebuano ceb
+Egyptian Arabic arz
+Afrikaans af
+Latin la
+Bosnian bs
+Telugu te
+Tagalog tl
+Icelandic is
+Norwegian (Nynorsk) nn
+Burmese my
+Hausa ha
+Mongolian mn
+Kurdish (Sorani) ckb
+Assamese as
+Marathi mr
+Central Bikol bcl
+Igbo ig
+Punjabi pa
+Occitan oc
+Asturian ast
+Javanese jv
+Welsh cy
+Belarusian(Taraškievica orthography) be-tarask
+Kannada kn
+South Azerbaijani azb
+Tatar tt
+Kyrgyz ky
+Nepali ne
+Sinhala si
+Irish ga
+Alemannic German als
+Southern Min zh-min-nan
+Tajik tg
+Breton br
+Aragonese an
+Scots sco
+Luxembourgish lb
+Kurdish (Kurmanji) ku
+Bashkir ba
+Waray war
+West Frisian fy
+Somali so
+Balinese ban
+Fiji Hindi hif
+Gujarati gu
+Wu Chinese wuu
+Dusun dtp
+Khmer km
+Western Punjabi pnb
+Yoruba yo
+Ido io
+Lombard lmo
+Maltese mt
+Bavarian bar
+Pashto ps
+Amharic am
+Minangkabau min
+Moroccan Arabic ary
+Chuvash cv
+Sundanese su
+Chechen ce
+Haitian Creole ht
+Kinyarwanda rw
+Low German nds
+Sanskrit sa
+Odia or
+Betawi bew
+Venetian vec
+Interlingua ia
+Karakalpak kaa
+Old English ang
+Fula ff
+Malagasy mg
+Quechua (Southern Quechua) qu
+Classical Chinese zh-classical
+Faroese fo
+Standard Moroccan Amazigh zgh
+Silesian szl
+Zulu zu
+Dagbani dag
+Western Armenian hyw
+Yiddish yi
+Acehnese ace
+Sindhi sd
+Banjarese bjn
+Madurese mad
+Rusyn rue
+Maithili mai
+Limburgish li
+Mingrelian xmf
+Tsonga ts
+Zaza diq
+Ladin lld
+Friulian fur
+Scottish Gaelic gd
+Corsican co
+Northern Sotho nso
+Võro fiu-vro
+Yakut sah
+Sardinian sc
+Sicilian scn
+Bihari (Bhojpuri) bh
+Angika anp
+Kapampangan pam
+Lao lo
+Turkmen tk
+Crimean Tatar crh
+Wayuu guc
+Interlingue ie
+Neapolitan nap
+Pennsylvania Dutch pdc
+Gorontalo gor
+Venda ve
+Mazanderani mzn
+Central Tibetan (Lhasa Tibetan) bo
+Walloon wa
+Judaeo-Spanish lad
+Ligurian lij
+Piedmontese pms
+Upper Sorbian hsb
+Kashmiri ks
+Abkhaz ab
+Hakka Chinese hak
+Ilocano ilo
+Picard pcd
+Volapük vo
+Avar av
+Kabyle kab
+Santali sat
+Aromanian roa-rup
+Lower Sorbian dsb
+Manx gv
+Swazi ss
+Papiamento pap
+Tulu tcy
+Wolof wo
+Aymara ay
+Cherokee chr
+Igala igl
+Kashubian csb
+Luganda lg
+North Frisian frr
+Sylheti syl
+Xhosa xh
+Guarani gn
+Franco-Provençal frp
+Greenlandic kl
+Gun guw
+Nigerian Pidgin pcm
+Tswana tn
+West Flemish vls
+Dzongkha dz
+Emilian–Romagnol eml
+Gagauz gag
+Maldivian dv
+Māori mi
+Romansh rm
+Sotho st
+Ossetian os
+Doteli dty
+Eastern Min cdo
+Gothic got
+Inari Sámi smn
+Inuktitut iu
+Lojban jbo
+Tuvan tyv
+Dutch Low Saxon nds-nl
+Banyumasan map-bms
+Zamboanga Chavacano cbk-zam
+Cornish kw
+Old Church Slavonic cu
+Twi tw
+Extremaduran ext
+Ghanaian Pidgin English gpe
+Hawaiian haw
+Kotava avk
+Lingua Franca Nova lfn
+Nahuatl nah
+Navajo nv
+Newar new
+Oromo om
+Udmurt udm
+Samogitian bat-smg
+Erzya myv
+Kirundi rn
+Meitei mni
+Saraiki skr
+Shilha shi
+Toba Batak bbc
+Uyghur ug
+Buryat (Russia Buriat) bxr
+Ewe ee
+Komi kv
+Kusaal kus
+Livvi-Karelian olo
+Meadow Mari mhr
+Moksha mdf
+N'Ko nqo
+Saterland Frisian stq
+Veps vep
+Zeelandic zea
+Northern Sámi se
+Awadhi awa
+Gan Chinese gan
+Gilaki glk
+Kongo kg
+Lezgian lez
+Mirandese mwl
+Tarantino roa-tara
+Tumbuka tum
+Buginese bug
+Cree cr
+Jamaican Patois jam
+Pa'O blk
+Palatine German pfl
+Pangasinan pag
+Sakizaya szy
+Shona sn
+Aramaic (Syriac) arc
+Atikamekw atj
+Bishnupriya Manipuri bpy
+Bislama bi
+Chewa ny
+Lingala ln
+Romani (Vlax Romani) rmy
+Samoan sm
+Central Kanuri knc
+Hill Mari mrj
+Iban iba
+Kalmyk Oirat xal
+Karachay-Balkar krc
+Latgalian ltg
+Norman nrm
+Talysh tly
+Konkani (Goan Konkani) gom
+Adyghe ady
+Fante fat
+Ingush inh
+Mon mnw
+Nias nia
+Novial nov
+Pannonian Rusyn rsk
+Tok Pisin tpi
+Zhuang (Standard Zhuang) za
+Bambara bm
+Dagaare dga
+Komi-Permyak koi
+Seediq trv
+Shan shn
+Amis ami
+Cheyenne chy
+Fijian fj
+Kabiye kbp
+Mandailing Batak btm
+Southern Ndebele nr
+Fon fon
+Kikuyu ki
+Lak lbe
+Pontic Greek pnt
+Tyap kcg
+Ripuarian ksh
+French Guianese Creole gcr
+Farefare (Gurene) gur
+Tongan to
+Chamorro ch
+Dinka din
+Iñupiaq ik
+Kabardian kbd
+Mooré mos
+Pali pi
+Sango sg
+Tetum tet
+Tigrinya ti
+Atayal tay
+Komering kge
+Paiwan pwn
+Tigre tig
+Southern Altai alt
+Sranan Tongo srn
+Tahitian ty
+Obolo ann
+Tai Nuea tdd
+West Coast Bajau bdr
