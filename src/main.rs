@@ -23,6 +23,10 @@ struct Args {
     #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..))]
     choice: Option<u8>,
 
+    /// Opne the Wikipedia page in default browser
+    #[arg(long)]
+    browser: bool,
+
     /// Topic to search on the Wikipedia
     #[arg(required=true)]
     topic: Vec<String>,
@@ -36,7 +40,7 @@ fn main() {
     let lang = args.lang.unwrap_or("en".to_string());
 
     if !LANGS.contains(&lang) {
-        println!("Invalid lang code");
+        eprintln!("Invalid lang code");
         return;
     }
 
@@ -45,7 +49,7 @@ fn main() {
     let choice = if topics.len() > 1 {
         if let Some(c) = args.choice.map(|t| t as usize) {
             if c < 1 || c > topics.len() {
-                println!("Index out of bound");
+                eprintln!("Index out of bound");
                 return;
             }
             c - 1
@@ -62,9 +66,18 @@ fn main() {
     } else if topics.len() == 1 {
         0
     } else {
-        println!("Nothing related to {} was found.", topic);
+        eprintln!("Nothing related to {} was found.", topic);
         return;
     };
+
+    if args.browser {
+        if webbrowser::open(&links[choice]).is_ok() {
+            println!("Opening the article in browser");
+        } else {
+            eprintln!("Error opening the link using browser");
+        }
+        return;
+    }
 
     print!("{}\n", topics[choice]);
 
