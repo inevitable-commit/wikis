@@ -71,7 +71,7 @@ $ wikis --browser "don't starve together"
 Opening the link in browser
 ```
 
-5. Take query form Stdin. Also with no text in prompts.
+6. Take query form Stdin. Also with no text in prompts.
 ```
 $ wikis --no-prompt-text --query-stdin
 arch linux
