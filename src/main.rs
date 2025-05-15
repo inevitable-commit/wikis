@@ -1,11 +1,16 @@
 use std::io::{self, Write};
 
-use clap::Parser;
-use wikis::{search, summarize, TopicSelector, TopicSelectorTerminal};
+use clap::{ArgGroup, Parser};
+use wikis::{search, summarize, TopicSelector, TopicSelectorTerminal, TopicTaker, TopicTakerStdin};
 
 /// A CLI tool to fetch a summary on a topic from Wikipedia.
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
+#[command(group(
+        ArgGroup::new("Query input method")
+        .args(["topic", "query_stdin"])
+        .required(true)
+))]
 struct Args {
     /// Don't provide the link
     #[arg(long)]
@@ -23,19 +28,38 @@ struct Args {
     #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..))]
     choice: Option<u8>,
 
-    /// Opne the Wikipedia page in default browser
+
+    /// Open the Wikipedia page in default browser
     #[arg(long)]
     browser: bool,
 
+    /// Take query from Stdin instead from arguments
+    #[arg(long)]
+    query_stdin: bool,
+
+    /// No texts in prompts
+    #[arg(long)]
+    no_prompt_text: bool,
+
     /// Topic to search on the Wikipedia
-    #[arg(required=true)]
+    #[arg()]
     topic: Vec<String>,
 }
 
 fn main() {
     let args = Args::parse();
 
-    let topic = args.topic.join(" ");
+    let topic = if args.query_stdin {
+        let tts = TopicTakerStdin{show_prompt_text: !args.no_prompt_text};
+        if let Some(q) = tts.take_topic() {
+            q
+        } else {
+            eprintln!("Error taking query from Stdin");
+            return;
+        }
+    }else{
+        args.topic.join(" ")
+    };
 
     let lang = args.lang.unwrap_or("en".to_string());
 
@@ -54,7 +78,7 @@ fn main() {
             }
             c - 1
         } else {
-            let from_term = TopicSelectorTerminal {}.select(&topics);
+            let from_term = TopicSelectorTerminal {show_prompt_text: ! args.no_prompt_text}.select(&topics);
 
             match from_term {
                 Some(c) => c,

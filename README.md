@@ -20,7 +20,9 @@ Similar to [wikit](https://github.com/KorySchneider/wikit), except with lots of 
 | `--no-summary`          | Don't provide the summary
 | `--lang <LANG>`         | Language edition of Wikipedia to use; defaults to en for English; Language code available at https://en.wikipedia.org/wiki/List_of_Wikipedias#Active_editions |
 | `-c, --choice <CHOICE>` | Index of the topic to choose without prompting  |
-| `--browser`             | Opne the Wikipedia page in default browser      |
+| `--browser`             | Open the Wikipedia page in default browser      |
+| `--query-stdin`         | Take query from Stdin instead from arguments    |
+| `--no-prompt-text`      | No texts in prompts                             |
 | `-h, --help`            | Print help                                      |
 | `-V, --version`         | Print version                                   |
 
@@ -67,6 +69,16 @@ Sharukh Khan
 ```
 $ wikis --browser "don't starve together"
 Opening the link in browser
+```
+
+5. Take query form Stdin. Also with no text in prompts.
+```
+$ wikis --no-prompt-text --query-stdin
+arch linux
+1
+Arch Linux
+https://en.wikipedia.org/wiki/Arch_Linux
+Arch Linux is an open source, rolling release Linux distribution. Arch Linux is kept up-to-date by regularly updating the individual pieces of software that it comprises. Arch Linux is intentionally minimal, and is meant to be configured by the user during installation so they may add only what they require.
 ```
 
 # Installation

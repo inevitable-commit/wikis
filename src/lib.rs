@@ -11,7 +11,7 @@ struct SearchResult {
     links: Vec<String>,
 }
 
-pub fn search(lang: &str, topic: &str ) -> (Vec<String>, Vec<String>) {
+pub fn search(lang: &str, topic: &str) -> (Vec<String>, Vec<String>) {
     let recieved = reqwest::blocking::get(format!(
         "https://{}.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
         lang, topic
@@ -57,17 +57,22 @@ pub trait ResultProcessor {
     fn process(&mut self, topic: String, link: String, summary: String);
 }
 
-pub struct TopicSelectorTerminal;
+pub struct TopicSelectorTerminal {
+    pub show_prompt_text: bool,
+}
 
 impl TopicSelector for TopicSelectorTerminal {
     fn select(&self, topics: &[String]) -> Option<usize> {
-        print!("Topics:\n");
-        topics
-            .iter()
-            .enumerate()
-            .for_each(|(i, topic)| print!("{}: {}\n", i + 1, topic));
+        if self.show_prompt_text {
+            print!("Topics:\n");
+            topics
+                .iter()
+                .enumerate()
+                .for_each(|(i, topic)| print!("{:>2}: {}\n", i + 1, topic));
 
-        print!("Select a topic (Default: \"{}\"): ", topics[0]);
+            print!("Select a topic (Default: \"{}\"): ", topics[0]);
+        }
+
         io::stdout().flush().expect("How does flushin stdout fail?");
 
         let mut guess = String::new();
@@ -86,7 +91,7 @@ impl TopicSelector for TopicSelectorTerminal {
             if choice > 0 && choice <= topics.len() as i32 {
                 Some(choice as usize - 1)
             } else {
-                println!("Index out of bound");
+                eprintln!("Index out of bound");
                 None
             }
         }
@@ -166,12 +171,18 @@ impl TopicTaker for TopicTakerArg {
 
 // when using with TopicSelectorTerminal provide the topic selection with the topic like:
 // "terraria\n2". because pipe is closed and topic read using stdin returns ""
-pub struct TopicTakerStdin;
+pub struct TopicTakerStdin {
+    pub show_prompt_text: bool,
+}
 
 impl TopicTaker for TopicTakerStdin {
     fn take_topic(&self) -> Option<String> {
-        let mut topic = String::new();
+        if self.show_prompt_text {
+            print!("Enter query: ");
+            io::stdout().flush().expect("How does flushin stdout fail?");
+        }
 
+        let mut topic = String::new();
         io::stdin()
             .lock()
             .read_line(&mut topic)
