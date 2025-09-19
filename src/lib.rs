@@ -20,12 +20,15 @@ static APP_USER_AGENT: &str = concat!(
 );
 
 pub fn search(lang: &str, topic: &str) -> (Vec<String>, Vec<String>) {
-    let response = reqwest::blocking::Client::new()
+    let response = reqwest::blocking::Client::builder()
+        .gzip(true)
+        .user_agent(APP_USER_AGENT)
+        .build()
+        .expect("Error building client")
         .get(format!(
             "https://{}.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
             lang, topic
         ))
-        .header(reqwest::header::USER_AGENT, APP_USER_AGENT)
         .send()
         .expect("Error when searching for the topic");
 
@@ -42,7 +45,11 @@ struct Summary {
 }
 
 pub fn summarize(lang: &str, title: &str) -> String {
-    let response = reqwest::blocking::Client::new()
+    let response = reqwest::blocking::Client::builder()
+        .gzip(true)
+        .user_agent(APP_USER_AGENT)
+        .build()
+        .expect("Error building client")
         .get(format!(
             "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
             lang, title

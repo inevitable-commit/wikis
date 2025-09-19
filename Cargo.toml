@@ -6,7 +6,7 @@ description = "A CLI tool to fetch a summary on a topic from Wikipedia."
 
 [dependencies]
 clap = { version = "4.5.37", features = ["derive"] }
-reqwest = { version = "0.11.16", features = ["json", "blocking"]}
+reqwest = { version = "0.11.16", features = ["json", "blocking", "gzip"]}
 serde = { version = "1.0.152", features = ["derive"]}
 serde_json = "1.0" 
 webbrowser = "1.0.4"
