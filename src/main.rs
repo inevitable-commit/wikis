@@ -3,9 +3,8 @@ use std::io::{self, Write};
 use clap::{ArgGroup, Parser};
 use wikis::{search, summarize, TopicSelector, TopicSelectorTerminal, TopicTaker, TopicTakerStdin};
 
-/// A CLI tool to fetch a summary on a topic from Wikipedia.
 #[derive(Parser, Debug)]
-#[command(version, about, long_about = None)]
+#[command(version, about = env!("CARGO_PKG_DESCRIPTION"), long_about = None)]
 #[command(group(
         ArgGroup::new("Query input method")
         .args(["topic", "query_stdin"])

@@ -11,15 +11,27 @@ struct SearchResult {
     links: Vec<String>,
 }
 
-pub fn search(lang: &str, topic: &str) -> (Vec<String>, Vec<String>) {
-    let recieved = reqwest::blocking::get(format!(
-        "https://{}.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
-        lang, topic
-    ))
-    .expect("Error when searching for the topic");
+// Name your user agent after your app?
+static APP_USER_AGENT: &str = concat!(
+    env!("CARGO_PKG_NAME"),
+    "/",
+    env!("CARGO_PKG_VERSION"),
+    " (https://github.com/inevitable-commit/wikis)"
+);
 
-    let json: SearchResult = serde_json::from_str(&recieved.text().unwrap())
-        .expect("Error on parsing JSON. Changes in the API?");
+pub fn search(lang: &str, topic: &str) -> (Vec<String>, Vec<String>) {
+    let response = reqwest::blocking::Client::new()
+        .get(format!(
+            "https://{}.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
+            lang, topic
+        ))
+        .header(reqwest::header::USER_AGENT, APP_USER_AGENT)
+        .send()
+        .expect("Error when searching for the topic");
+
+    let json: SearchResult =
+        serde_json::from_str(&response.text().expect("Failed getting text from response."))
+            .expect("Error on parsing JSON. Changes in the API?");
 
     (json.titles, json.links)
 }
@@ -30,13 +42,16 @@ struct Summary {
 }
 
 pub fn summarize(lang: &str, title: &str) -> String {
-    let recieved = reqwest::blocking::get(format!(
-        "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
-        lang, title
-    ))
-    .expect("Error when getting the summary");
+    let response = reqwest::blocking::Client::new()
+        .get(format!(
+            "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
+            lang, title
+        ))
+        .header(reqwest::header::USER_AGENT, APP_USER_AGENT)
+        .send()
+        .expect("Error when searching for the topic");
 
-    let json: Summary = serde_json::from_str(&recieved.text().unwrap()).unwrap();
+    let json: Summary = serde_json::from_str(&response.text().unwrap()).unwrap();
     json.extract
 }
 
