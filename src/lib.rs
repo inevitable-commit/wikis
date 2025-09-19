@@ -11,7 +11,6 @@ struct SearchResult {
     links: Vec<String>,
 }
 
-// Name your user agent after your app?
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     "/",
@@ -54,7 +53,6 @@ pub fn summarize(lang: &str, title: &str) -> String {
             "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
             lang, title
         ))
-        .header(reqwest::header::USER_AGENT, APP_USER_AGENT)
         .send()
         .expect("Error when searching for the topic");
 
