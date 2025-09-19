@@ -6,7 +6,7 @@ Similar to [wikit](https://github.com/KorySchneider/wikit), except with lots of 
 # Usage
 **Syntax**: 
 
-``wikis [OPTIONS] [TOPIC]...``
+``wikis [OPTIONS] <TOPIC|--query-stdin>``
 
 **Arguments**:
 
@@ -82,7 +82,7 @@ Arch Linux is an open source, rolling release Linux distribution. Arch Linux is 
 ```
 
 # Installation
-For now the installation can only be done compiling the source code and installing the program using Cargo.
+For now the installation can only be done by compiling the source code and installing the program using Cargo.
 1. Clone this repo.
 2. Open terminal in the cloned directory and run following command.
 ```
