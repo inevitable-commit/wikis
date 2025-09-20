@@ -1,9 +1,9 @@
+use percent_encoding::NON_ALPHANUMERIC;
 use reqwest::header::LOCATION;
 use reqwest::redirect::Policy;
 use serde::Deserialize;
 use std::env::args;
 use std::io::{self, BufRead, Write};
-use std::os::linux::raw::stat;
 use std::process::{Command, Stdio};
 
 #[derive(Deserialize)]
@@ -60,11 +60,13 @@ impl MyClient {
     }
 
     pub fn summarize(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
+        let encoded_title = percent_encoding::utf8_percent_encode(title, NON_ALPHANUMERIC).to_string();
         let response = self
             .client
             .get(format!(
                 "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
-                lang, title
+                //"https://{}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={}",
+                lang, encoded_title
             ))
             .send()
             .expect("Error when requesting summary for the topic");
