@@ -1,6 +1,9 @@
+use reqwest::header::LOCATION;
+use reqwest::redirect::Policy;
 use serde::Deserialize;
 use std::env::args;
 use std::io::{self, BufRead, Write};
+use std::os::linux::raw::stat;
 use std::process::{Command, Stdio};
 
 #[derive(Deserialize)]
@@ -11,6 +14,11 @@ struct SearchResult {
     links: Vec<String>,
 }
 
+#[derive(Deserialize)]
+struct Summary {
+    extract: String,
+}
+
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
     "/",
@@ -18,46 +26,82 @@ static APP_USER_AGENT: &str = concat!(
     " (https://github.com/inevitable-commit/wikis)"
 );
 
-pub fn search(lang: &str, topic: &str) -> (Vec<String>, Vec<String>) {
-    let response = reqwest::blocking::Client::builder()
-        .gzip(true)
-        .user_agent(APP_USER_AGENT)
-        .build()
-        .expect("Error building client")
-        .get(format!(
-            "https://{}.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
-            lang, topic
-        ))
-        .send()
-        .expect("Error when searching for the topic");
-
-    let json: SearchResult =
-        serde_json::from_str(&response.text().expect("Failed getting text from response."))
-            .expect("Error on parsing JSON. Changes in the API?");
-
-    (json.titles, json.links)
+pub struct MyClient {
+    client: reqwest::blocking::Client,
 }
 
-#[derive(Deserialize)]
-struct Summary {
-    extract: String,
-}
+impl MyClient {
+    pub fn new() -> Self {
+        Self {
+            client: reqwest::blocking::Client::builder()
+                .gzip(true)
+                .user_agent(APP_USER_AGENT)
+                .redirect(Policy::none())
+                .build()
+                .expect("Error building client"),
+        }
+    }
 
-pub fn summarize(lang: &str, title: &str) -> String {
-    let response = reqwest::blocking::Client::builder()
-        .gzip(true)
-        .user_agent(APP_USER_AGENT)
-        .build()
-        .expect("Error building client")
-        .get(format!(
-            "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
-            lang, title
-        ))
-        .send()
-        .expect("Error when searching for the topic");
+    pub fn search(&self, lang: &str, topic: &str) -> (Vec<String>, Vec<String>) {
+        let response = self
+            .client
+            .get(format!(
+                "https://{}.wikipedia.org/w/api.php?format=json&action=opensearch&search={}",
+                lang, topic
+            ))
+            .send()
+            .expect("Error when searching for the topic");
 
-    let json: Summary = serde_json::from_str(&response.text().unwrap()).unwrap();
-    json.extract
+        let json: SearchResult = response
+            .json::<SearchResult>()
+            .expect("Error on parsing JSON.");
+
+        (json.titles, json.links)
+    }
+
+    pub fn summarize(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
+        let response = self
+            .client
+            .get(format!(
+                "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
+                lang, title
+            ))
+            .send()
+            .expect("Error when requesting summary for the topic");
+
+        let status = response.status();
+
+        if status.is_success() {
+            (
+                title.to_string(),
+                link.to_string(),
+                response.json::<Summary>().unwrap().extract,
+            )
+        } else if status.as_u16() == 403 { // 403 for Special:Random
+            let response = self
+                .client
+                .get(format!("https://{}.wikipedia.org/wiki/{}", lang, title))
+                .send()
+                .expect("Error when fetching HTML page of the topic");
+
+            let status = response.status();
+
+            if status.is_redirection() {
+                let link = response
+                    .headers()
+                    .get(LOCATION)
+                    .expect("Expecting location header")
+                    .to_str()
+                    .expect("Header contained non ASCII characters.");
+                let title = link.split("/").last().unwrap();
+                self.summarize(lang, title, link) // finger cross, no infinite recursion
+            } else {
+                panic!("This? {} {} ", status.as_str(), response.url().as_str());
+            }
+        } else {
+            panic!("{}", status.as_str())
+        }
+    }
 }
 
 // can't figure out proper interfaces

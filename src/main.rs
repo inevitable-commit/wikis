@@ -1,7 +1,7 @@
 use std::io::{self, Write};
 
 use clap::{ArgGroup, Parser};
-use wikis::{search, summarize, TopicSelector, TopicSelectorTerminal, TopicTaker, TopicTakerStdin};
+use wikis::{MyClient, TopicSelector, TopicSelectorTerminal, TopicTaker, TopicTakerStdin};
 
 #[derive(Parser, Debug)]
 #[command(version, about = env!("CARGO_PKG_DESCRIPTION"), long_about = None)]
@@ -67,7 +67,9 @@ fn main() {
         return;
     }
 
-    let (topics, links) = search(&lang, &topic);
+    let client = MyClient::new();
+
+    let (topics, links) = client.search(&lang, &topic);
 
     let choice = if topics.len() > 1 {
         if let Some(c) = args.choice.map(|t| t as usize) {
@@ -102,14 +104,15 @@ fn main() {
         return;
     }
 
-    print!("{}\n", topics[choice]);
+    let (title, link, summary) = client.summarize(&lang, &topics[choice], &links[choice]);
+
+    print!("{}\n", title);
 
     if !args.no_link {
-        print!("{}\n", links[choice]);
+        print!("{}\n", link);
     }
 
     if !args.no_summary {
-        let summary = summarize(&lang, &topics[choice]);
         print!("{}\n", summary);
     }
 
