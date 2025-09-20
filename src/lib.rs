@@ -83,7 +83,7 @@ impl MyClient {
                 link.to_string(),
                 response.json::<Summary>().unwrap().extract,
             )
-        } else if status.as_u16() == 403 { // 403 for Special:Random
+        } else if status.as_u16() == 403 { // 403 for Special:Random. Also redirection
             let response = self
                 .client
                 .get(format!("https://{}.wikipedia.org/wiki/{}", lang, title))
@@ -115,7 +115,7 @@ impl MyClient {
                 exit(1)
             }
         } else {
-            eprintln!("Could fetch the summary on {}. The link is {}", title, link);
+            eprintln!("Couldn't fetch the summary on {}. The link is {}", title, link);
             exit(1)
         }
     }
