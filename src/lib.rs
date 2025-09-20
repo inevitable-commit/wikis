@@ -1,10 +1,10 @@
-use percent_encoding::NON_ALPHANUMERIC;
+use percent_encoding::{AsciiSet, CONTROLS};
 use reqwest::header::LOCATION;
 use reqwest::redirect::Policy;
 use serde::Deserialize;
 use std::env::args;
 use std::io::{self, BufRead, Write};
-use std::process::{Command, Stdio};
+use std::process::{exit, Command, Stdio};
 
 #[derive(Deserialize)]
 struct SearchResult {
@@ -18,6 +18,8 @@ struct SearchResult {
 struct Summary {
     extract: String,
 }
+
+const FRAGMENT: &AsciiSet = &CONTROLS.add(b'/');
 
 static APP_USER_AGENT: &str = concat!(
     env!("CARGO_PKG_NAME"),
@@ -60,13 +62,15 @@ impl MyClient {
     }
 
     pub fn summarize(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
-        let encoded_title = percent_encoding::utf8_percent_encode(title, NON_ALPHANUMERIC).to_string();
+        let encoded_title =
+            percent_encoding::utf8_percent_encode(title, FRAGMENT).to_string();
         let response = self
             .client
             .get(format!(
                 "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
                 //"https://{}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={}",
-                lang, encoded_title
+                lang,
+                encoded_title
             ))
             .send()
             .expect("Error when requesting summary for the topic");
@@ -95,13 +99,24 @@ impl MyClient {
                     .expect("Expecting location header")
                     .to_str()
                     .expect("Header contained non ASCII characters.");
-                let title = link.split("/").last().unwrap();
-                self.summarize(lang, title, link) // finger cross, no infinite recursion
+
+                let title = link
+                    .split(&format!("https://{}.wikipedia.org/wiki/", lang))
+                    .last()
+                    .unwrap();
+
+                self.summarize(lang, title, link) // finger cross, no infinite recursion. Potential
+                                                  // problems: Titles with symbols
             } else {
-                panic!("This? {} {} ", status.as_str(), response.url().as_str());
+                eprintln!(
+                    "Expected redirection.\nTitle: {}\nLink: {}\n encoded_title: {}",
+                    title, link, encoded_title
+                );
+                exit(1)
             }
         } else {
-            panic!("{}", status.as_str())
+            eprintln!("Could fetch the summary on {}. The link is {}", title, link);
+            exit(1)
         }
     }
 }
