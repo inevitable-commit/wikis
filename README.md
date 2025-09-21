@@ -2,7 +2,13 @@
 A CLI tool to fetch a summary on a topic from Wikipedia.
 
 Similar to [wikit](https://github.com/KorySchneider/wikit), except with lots of limitations.
-
+# Installation
+For now the installation can only be done by compiling the source code and installing the program using Cargo.
+1. Clone this repo.
+2. Open terminal in the cloned directory and run following command.
+```
+$ cargo install --path .
+```
 # Usage
 **Syntax**: 
 
@@ -14,17 +20,18 @@ Similar to [wikit](https://github.com/KorySchneider/wikit), except with lots of 
 
 **Options**:
 
-| Flag                    | Description                                     |
-| ----------------------- | ----------------------------------------------- |
-| `--no-link`             | Don't provide the link
-| `--no-summary`          | Don't provide the summary
-| `--lang <LANG>`         | Language edition of Wikipedia to use; defaults to en for English; Language code available at https://en.wikipedia.org/wiki/List_of_Wikipedias#Active_editions |
-| `-c, --choice <CHOICE>` | Index of the topic to choose without prompting  |
-| `--browser`             | Open the Wikipedia page in default browser      |
-| `--query-stdin`         | Take query from Stdin instead from arguments    |
-| `--no-prompt-text`      | No texts in prompts                             |
-| `-h, --help`            | Print help                                      |
-| `-V, --version`         | Print version                                   |
+| Flag                    | Description                                                                                                                                                                                                                                                                                                                                                     |
+| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--no-link`             | Don't provide the link                                                                                                                                                                                                                                                                                                                                          |
+| `--no-summary`          | Don't provide the summary                                                                                                                                                                                                                                                                                                                                       |
+| `--lang <LANG>`         | Language edition of Wikipedia to use; defaults to en for English; Language code available at https://en.wikipedia.org/wiki/List_of_Wikipedias#Active_editions                                                                                                                                                                                                   |
+| `-c, --choice <CHOICE>` | Index of the topic to choose without prompting                                                                                                                                                                                                                                                                                                                  |
+| `--browser`             | Open the Wikipedia page in default browser                                                                                                                                                                                                                                                                                                                      |
+| `--v1`                  | Use `summarize` version 1. It uses the API endpoint https://{lang}.wikipedia.org/api/rest_v1/page/summary/{title} to fetch the summary. By default `summarize` version 2 is used which uses the API endpoint https://{lang}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={title} to fetch the summary. |
+| `--query-stdin`         | Take query from Stdin instead from arguments                                                                                                                                                                                                                                                                                                                    |
+| `--no-prompt-text`      | No texts in prompts                                                                                                                                                                                                                                                                                                                                             |
+| `-h, --help`            | Print help                                                                                                                                                                                                                                                                                                                                                      |
+| `-V, --version`         | Print version                                                                                                                                                                                                                                                                                                                                                   |
 
 By default, the program will ask to choose a topic if multiple topic related to the query is found. Also, the link to the Wikipedia page for the chosen topic will be given.
 # Examples
@@ -71,7 +78,7 @@ $ wikis --browser "don't starve together"
 Opening the link in browser
 ```
 
-6. Take query form Stdin. Also with no text in prompts.
+6. Take query form `Stdin`. Also with no text in prompts.
 ```
 $ wikis --no-prompt-text --query-stdin
 arch linux
@@ -79,12 +86,4 @@ arch linux
 Arch Linux
 https://en.wikipedia.org/wiki/Arch_Linux
 Arch Linux is an open source, rolling release Linux distribution. Arch Linux is kept up-to-date by regularly updating the individual pieces of software that it comprises. Arch Linux is intentionally minimal, and is meant to be configured by the user during installation so they may add only what they require.
-```
-
-# Installation
-For now the installation can only be done by compiling the source code and installing the program using Cargo.
-1. Clone this repo.
-2. Open terminal in the cloned directory and run following command.
-```
-$ cargo install --path .
 ```

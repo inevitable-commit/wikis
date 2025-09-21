@@ -2,6 +2,7 @@ use percent_encoding::{AsciiSet, CONTROLS};
 use reqwest::header::LOCATION;
 use reqwest::redirect::Policy;
 use serde::Deserialize;
+use serde_json::Value;
 use std::env::args;
 use std::io::{self, BufRead, Write};
 use std::process::{exit, Command, Stdio};
@@ -61,61 +62,93 @@ impl MyClient {
         (json.titles, json.links)
     }
 
-    pub fn summarize(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
-        let encoded_title =
-            percent_encoding::utf8_percent_encode(title, FRAGMENT).to_string();
+    pub fn summarize_v1(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
+        let encoded_title = percent_encoding::utf8_percent_encode(title, FRAGMENT).to_string();
         let response = self
             .client
             .get(format!(
                 "https://{}.wikipedia.org/api/rest_v1/page/summary/{}",
-                //"https://{}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={}",
-                lang,
-                encoded_title
+                lang, encoded_title
             ))
             .send()
             .expect("Error when requesting summary for the topic");
 
         let status = response.status();
-
         if status.is_success() {
             (
                 title.to_string(),
                 link.to_string(),
                 response.json::<Summary>().unwrap().extract,
             )
-        } else if status.as_u16() == 403 { // 403 for Special:Random. Also redirection
-            let response = self
-                .client
-                .get(format!("https://{}.wikipedia.org/wiki/{}", lang, title))
-                .send()
-                .expect("Error when fetching HTML page of the topic");
-
-            let status = response.status();
-
-            if status.is_redirection() {
-                let link = response
-                    .headers()
-                    .get(LOCATION)
-                    .expect("Expecting location header")
-                    .to_str()
-                    .expect("Header contained non ASCII characters.");
-
-                let title = link
-                    .split(&format!("https://{}.wikipedia.org/wiki/", lang))
-                    .last()
-                    .unwrap();
-
-                self.summarize(lang, title, link) // finger cross, no infinite recursion. Potential
-                                                  // problems: Titles with symbols
-            } else {
-                eprintln!(
-                    "Expected redirection.\nTitle: {}\nLink: {}\n encoded_title: {}",
-                    title, link, encoded_title
-                );
-                exit(1)
-            }
         } else {
-            eprintln!("Couldn't fetch the summary on {}. The link is {}", title, link);
+            eprintln!(
+                "Couldn't fetch the summary on {}. The link is {}",
+                title, link
+            );
+            exit(1)
+        }
+    }
+
+    pub fn summarize_v2(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
+        let response = self
+            .client
+            .get(format!(
+                "https://{}.wikipedia.org/w/api.php?format=json&action=query&prop=extracts&exintro&explaintext&redirects=1&titles={}",
+                lang,
+                title
+            ))
+            .send()
+            .expect("Error when requesting summary for the topic");
+
+        // Parse the JSON
+        let v = response.json::<Value>().unwrap();
+
+        if let Some(pages) = v["query"]["pages"].as_object() {
+            for (page_id, page_data) in pages {
+                if page_id == "-1" {
+                    break
+                }
+
+                if let Some(extract) = page_data["extract"].as_str() {
+                    return (
+                        title.to_string(),
+                        link.to_string(),
+                        extract.split("\n").next().unwrap().to_string(),
+                    );
+                } 
+
+                break;
+            }
+        }
+
+        eprintln!("No summary found on {}. Link: {}", title, link);
+        exit(1);
+    }
+
+    fn handle_refer(&self, link: &str) -> String { // might require loop to for redirection to
+                                                   // redirections
+        let response = self
+            .client
+            .get(link)
+            .send()
+            .expect("Error when fetching HTML page of the topic");
+
+        let status = response.status();
+
+        if status.is_redirection() {
+            let link = response
+                .headers()
+                .get(LOCATION)
+                .expect("Expecting location header")
+                .to_str()
+                .expect("Header contained non ASCII characters.");
+
+            link.to_string()
+        } else {
+            eprintln!(
+                "Expected redirection.\nLink: {}",
+                link
+            );
             exit(1)
         }
     }

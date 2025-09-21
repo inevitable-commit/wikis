@@ -1,6 +1,6 @@
 [package]
 name = "wikis"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2021"
 description = "A CLI tool to fetch a summary on a topic from Wikipedia."
 

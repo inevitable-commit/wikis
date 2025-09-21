@@ -1,4 +1,7 @@
-use std::io::{self, Write};
+use std::{
+    io::{self, Write},
+    process::exit,
+};
 
 use clap::{ArgGroup, Parser};
 use wikis::{MyClient, TopicSelector, TopicSelectorTerminal, TopicTaker, TopicTakerStdin};
@@ -23,14 +26,17 @@ struct Args {
     #[arg(long)]
     lang: Option<String>,
 
-    /// Index of the topic to choose without prompting 
+    /// Index of the topic to choose without prompting
     #[arg(short, long, value_parser = clap::value_parser!(u8).range(1..))]
     choice: Option<u8>,
-
 
     /// Open the Wikipedia page in default browser
     #[arg(long)]
     browser: bool,
+
+    /// Use summarize version 1 instead
+    #[arg(long)]
+    v1: bool,
 
     /// Take query from Stdin instead from arguments
     #[arg(long)]
@@ -49,14 +55,16 @@ fn main() {
     let args = Args::parse();
 
     let topic = if args.query_stdin {
-        let tts = TopicTakerStdin{show_prompt_text: !args.no_prompt_text};
+        let tts = TopicTakerStdin {
+            show_prompt_text: !args.no_prompt_text,
+        };
         if let Some(q) = tts.take_topic() {
             q
         } else {
             eprintln!("Error taking query from Stdin");
-            return;
+            exit(1);
         }
-    }else{
+    } else {
         args.topic.join(" ")
     };
 
@@ -64,7 +72,7 @@ fn main() {
 
     if !LANGS.contains(&lang) {
         eprintln!("Invalid lang code");
-        return;
+        exit(1);
     }
 
     let client = MyClient::new();
@@ -75,16 +83,19 @@ fn main() {
         if let Some(c) = args.choice.map(|t| t as usize) {
             if c < 1 || c > topics.len() {
                 eprintln!("Index out of bound");
-                return;
+                exit(1);
             }
             c - 1
         } else {
-            let from_term = TopicSelectorTerminal {show_prompt_text: ! args.no_prompt_text}.select(&topics);
+            let from_term = TopicSelectorTerminal {
+                show_prompt_text: !args.no_prompt_text,
+            }
+            .select(&topics);
 
             match from_term {
                 Some(c) => c,
                 None => {
-                    return;
+                    exit(1);
                 }
             }
         }
@@ -92,7 +103,7 @@ fn main() {
         0
     } else {
         eprintln!("Nothing related to {} was found.", topic);
-        return;
+        exit(1);
     };
 
     if args.browser {
@@ -101,10 +112,14 @@ fn main() {
         } else {
             eprintln!("Error opening the link using browser");
         }
-        return;
+        exit(1);
     }
 
-    let (title, link, summary) = client.summarize(&lang, &topics[choice], &links[choice]);
+    let (title, link, summary) = if args.v1{
+        client.summarize_v1(&lang, &topics[choice], &links[choice])
+    } else {
+        client.summarize_v2(&lang, &topics[choice], &links[choice])
+    };
 
     print!("{}\n", title);
 
@@ -119,7 +134,7 @@ fn main() {
     io::stdout().flush().unwrap();
 }
 
-const LANGS:&str = "en
+const LANGS: &str = "en
 fr
 de
 es
