@@ -94,7 +94,7 @@ fn main() {
 
     match title.as_str() {
         "Special:Random" | "Special:RandomPage" => {
-            link = client.handle_refer("https://en.wikipedia.org/wiki/Special:Random");
+            link = client.handle_refer(&format!("https://{}.wikipedia.org/wiki/Special:Random", lang));
             title = link
                 .split("wikipedia.org/wiki/")
                 .last()
