@@ -6,11 +6,137 @@ use std::{
 use clap::{ArgGroup, Parser};
 use wikis::{MyClient, TopicSelector, TopicSelectorTerminal, TopicTaker, TopicTakerStdin};
 
+fn main() {
+    let args = Args::parse();
+
+    let lang = args.lang.unwrap_or("en".to_string());
+
+    if !LANGS.contains(&lang) {
+        eprintln!("Invalid lang code");
+        exit(1);
+    }
+    let client = MyClient::new();
+    let mut title;
+    let mut link;
+
+    if !args.random && !args.randomrootpage {
+        let query = if args.query_stdin {
+            let tts = TopicTakerStdin {
+                show_prompt_text: !args.no_prompt_text,
+            };
+            if let Some(q) = tts.take_topic() {
+                q
+            } else {
+                eprintln!("Error taking query from Stdin");
+                exit(1);
+            }
+        } else {
+            args.topic.join(" ")
+        };
+
+        let (titles, links) = client.search(&lang, &query);
+
+        let choice = if titles.len() > 1 {
+            if let Some(c) = args.choice.map(|t| t as usize) {
+                if c < 1 || c > titles.len() {
+                    eprintln!("Index out of bound");
+                    exit(1);
+                }
+                c - 1
+            } else {
+                let from_term = TopicSelectorTerminal {
+                    show_prompt_text: !args.no_prompt_text,
+                }
+                .select(&titles);
+
+                match from_term {
+                    Some(c) => c,
+                    None => {
+                        exit(1);
+                    }
+                }
+            }
+        } else if titles.len() == 1 {
+            0
+        } else {
+            eprintln!("Nothing related to {} was found.", query);
+            exit(1);
+        };
+
+        title = titles[choice].clone();
+        link = links[choice].clone();
+
+    } else if args.randomrootpage {
+        title = "Special:RandomRootpage".to_string();
+        link = format!("https://{}.wikipedia.org/wiki/Special:RandomRootpage", lang);
+    } else {
+        title = "Special:Random".to_string();
+        link = format!("https://{}.wikipedia.org/wiki/Special:Random", lang);
+    }
+
+    if args.browser {
+        if webbrowser::open(&link).is_ok() {
+            println!("Opening the article in browser");
+            exit(0);
+        } else {
+            eprintln!("Error opening the link using browser");
+            exit(1);
+        }
+    }
+
+    if QUIRKY_WIKIPEDIA_TITLES.contains(&title.as_str()) {
+        eprintln!(
+            "Quirky Wikipedia page: {}\nOpen the page in the browser instead.\nLink: {}",
+            title, link
+        );
+        exit(1);
+    }
+
+    match title.as_str() {
+        "Special:Random" | "Special:RandomPage" => {
+            link = client.handle_refer("https://en.wikipedia.org/wiki/Special:Random");
+            title = link
+                .split("wikipedia.org/wiki/")
+                .last()
+                .unwrap()
+                .to_string();
+        }
+
+        "Special:RandomRootpage" => {
+            link = client.handle_refer(&link);
+            title = link
+                .split("wikipedia.org/wiki/")
+                .last()
+                .unwrap()
+                .to_string();
+        }
+        _ => {}
+    };
+
+    let summary = if args.v1 {
+        client.summarize_v1(&lang, &title, &link)
+    } else {
+        client.summarize_v2(&lang, &title, &link)
+    };
+
+    print!("{}\n", title);
+
+    if !args.no_link {
+        print!("{}\n", link);
+    }
+
+    if !args.no_summary {
+        print!("{}\n", summary);
+    }
+
+    io::stdout().flush().unwrap();
+}
+
 #[derive(Parser, Debug)]
 #[command(version, about = env!("CARGO_PKG_DESCRIPTION"), long_about = None)]
 #[command(group(
         ArgGroup::new("Query input method")
-        .args(["topic", "query_stdin"])
+        .args(["topic", "query_stdin", "random", "randomrootpage"])
         .required(true)
 ))]
 struct Args {
@@ -46,93 +172,37 @@ struct Args {
     #[arg(long)]
     no_prompt_text: bool,
 
+    /// Summary on random title
+    #[arg(long)]
+    random: bool,
+
+    /// Summary on random root page
+    #[arg(long)]
+    randomrootpage: bool,
+
     /// Topic to search on the Wikipedia
     #[arg()]
     topic: Vec<String>,
 }
 
-fn main() {
-    let args = Args::parse();
-
-    let topic = if args.query_stdin {
-        let tts = TopicTakerStdin {
-            show_prompt_text: !args.no_prompt_text,
-        };
-        if let Some(q) = tts.take_topic() {
-            q
-        } else {
-            eprintln!("Error taking query from Stdin");
-            exit(1);
-        }
-    } else {
-        args.topic.join(" ")
-    };
-
-    let lang = args.lang.unwrap_or("en".to_string());
-
-    if !LANGS.contains(&lang) {
-        eprintln!("Invalid lang code");
-        exit(1);
-    }
-
-    let client = MyClient::new();
-
-    let (topics, links) = client.search(&lang, &topic);
-
-    let choice = if topics.len() > 1 {
-        if let Some(c) = args.choice.map(|t| t as usize) {
-            if c < 1 || c > topics.len() {
-                eprintln!("Index out of bound");
-                exit(1);
-            }
-            c - 1
-        } else {
-            let from_term = TopicSelectorTerminal {
-                show_prompt_text: !args.no_prompt_text,
-            }
-            .select(&topics);
-
-            match from_term {
-                Some(c) => c,
-                None => {
-                    exit(1);
-                }
-            }
-        }
-    } else if topics.len() == 1 {
-        0
-    } else {
-        eprintln!("Nothing related to {} was found.", topic);
-        exit(1);
-    };
-
-    if args.browser {
-        if webbrowser::open(&links[choice]).is_ok() {
-            println!("Opening the article in browser");
-        } else {
-            eprintln!("Error opening the link using browser");
-        }
-        exit(1);
-    }
-
-    let (title, link, summary) = if args.v1{
-        client.summarize_v1(&lang, &topics[choice], &links[choice])
-    } else {
-        client.summarize_v2(&lang, &topics[choice], &links[choice])
-    };
-
-    print!("{}\n", title);
-
-    if !args.no_link {
-        print!("{}\n", link);
-    }
-
-    if !args.no_summary {
-        print!("{}\n", summary);
-    }
-
-    io::stdout().flush().unwrap();
-}
+const QUIRKY_WIKIPEDIA_TITLES: [&'static str; 13] = [
+    //"Special:Random",
+    //"Special:RandomPage",
+    //"Special:RandomRootpage",
+    "Special:RandomRedirect",
+    "Special:RandomInCategory",
+    "Special:WhatLinksHere",
+    "Special:AllPages",
+    "Special:RecentChanges",
+    "Special:ShortPages",
+    "Special:LongPages",
+    "Special:DeadendPages",
+    "Special:UncategorizedPages",
+    "Special:WantedPages",
+    "Special:Randomredirect",
+    "Special:MostLinkedPages",
+    "Special:DisambiguationPages",
+];
 
 const LANGS: &str = "en
 fr

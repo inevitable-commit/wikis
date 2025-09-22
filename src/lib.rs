@@ -62,7 +62,7 @@ impl MyClient {
         (json.titles, json.links)
     }
 
-    pub fn summarize_v1(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
+    pub fn summarize_v1(&self, lang: &str, title: &str, link: &str) -> String {
         let encoded_title = percent_encoding::utf8_percent_encode(title, FRAGMENT).to_string();
         let response = self
             .client
@@ -75,21 +75,14 @@ impl MyClient {
 
         let status = response.status();
         if status.is_success() {
-            (
-                title.to_string(),
-                link.to_string(),
-                response.json::<Summary>().unwrap().extract,
-            )
+            response.json::<Summary>().unwrap().extract
         } else {
-            eprintln!(
-                "Couldn't fetch the summary on {}. The link is {}",
-                title, link
-            );
+            eprintln!("Couldn't fetch the summary on {}. The link is {}", title, link);
             exit(1)
         }
     }
 
-    pub fn summarize_v2(&self, lang: &str, title: &str, link: &str) -> (String, String, String) {
+    pub fn summarize_v2(&self, lang: &str, title: &str, link: &str) -> String {
         let response = self
             .client
             .get(format!(
@@ -106,16 +99,12 @@ impl MyClient {
         if let Some(pages) = v["query"]["pages"].as_object() {
             for (page_id, page_data) in pages {
                 if page_id == "-1" {
-                    break
+                    break;
                 }
 
                 if let Some(extract) = page_data["extract"].as_str() {
-                    return (
-                        title.to_string(),
-                        link.to_string(),
-                        extract.split("\n").next().unwrap().to_string(),
-                    );
-                } 
+                    return extract.split("\n").next().unwrap().to_string();
+                }
 
                 break;
             }
@@ -125,8 +114,9 @@ impl MyClient {
         exit(1);
     }
 
-    fn handle_refer(&self, link: &str) -> String { // might require loop to for redirection to
-                                                   // redirections
+    pub fn handle_refer(&self, link: &str) -> String {
+        // might require loop to for redirection to
+        // redirections
         let response = self
             .client
             .get(link)
@@ -145,10 +135,7 @@ impl MyClient {
 
             link.to_string()
         } else {
-            eprintln!(
-                "Expected redirection.\nLink: {}",
-                link
-            );
+            eprintln!("Expected redirection.\nLink: {}", link);
             exit(1)
         }
     }
