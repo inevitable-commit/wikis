@@ -1,0 +1,123 @@
+.\" Manpage for wikis
+.TH WIKIS 1 "v0.1.3" "September 2025" "wikis manual"
+.SH NAME
+\fBwikis\fR \- A CLI tool to fetch a summary on a topic from Wikipedia.
+
+.SH SYNOPSIS
+.B wikis
+.RB [OPTIONS]
+<\fITOPIC\fR | \fB--query-stdin\fR | \fB--random\fR | \fB--randomrootpage\fR>
+
+.SH DESCRIPTION
+\fBwikis\fR is a command-line tool to fetch and print a summary of a topic from Wikipedia to \fBstdout\fR.
+It allows selecting the language, opening the article in a browser, getting random summaries,
+and more.
+.PP
+By default, \fBwikis\fR will prompt the user to choose a title if more than one title related to the topic is found and print the chosen title, it's Wikipedia page link, and it's summary to \fBstdout\fR.
+
+.SH OPTIONS
+.TP
+\fITOPIC\fR
+The topic to search for on Wikipedia. The topic can contain multiple words with spaces.
+
+.TP
+\fB--no-link\fR
+Do not print the link to the Wikipedia page.
+
+.TP
+\fB--no-summary\fR
+Do not print the summary.
+
+.TP
+\fB--lang\fR \fILANG\fR
+Specify the Wikipedia language edition (default is 'en' for English).
+
+.TP
+\fB--choice\fR, \fB-c\fR \fICHOICE\fR
+Automatically select the Nth result from the matched topic list.
+
+.TP
+\fB--v1\fR
+Use the v1 summary API (REST endpoint). Default is v2 (action=query).
+
+.TP
+\fB--query-stdin\fR
+Read the search query from standard input instead of the command-line arguments.
+
+.TP
+\fB--no-prompt-text\fR
+Suppress additional prompt texts.
+
+.TP
+\fB--random\fR
+Fetch and print a summary for a random Wikipedia page.
+
+.TP
+\fB--randomrootpage\fR
+Fetch a summary for a random root Wikipedia page.
+
+.TP
+\fB--browser\fR
+Open the Wikipedia page in the default web browser.
+
+.TP
+\fB-h\fR, \fB--help\fR
+Show help and exit.
+
+.TP
+\fB-V\fR, \fB--version\fR
+Show version information and exit.
+.SH EXAMPLES
+
+.TP
+Get summary of a topic:
+.nf
+$ wikis Arch Linux
+.fi
+
+.TP
+Suppress link:
+.nf
+$ wikis --no-link Arch Linux
+.fi
+
+.TP
+Only get link of second matching topic:
+.nf
+$ wikis --no-summary -c 2 Arch Linux
+.fi
+
+.TP
+Use Hindi Wikipedia:
+.nf
+$ wikis --lang hi Sharukh Khan
+.fi
+
+.TP
+Open the article in browser:
+.nf
+$ wikis --browser "Don't Starve Together"
+.fi
+
+.TP
+Read query from stdin:
+.nf
+$ echo "Arch Linux" | wikis --query-stdin
+.fi
+
+.TP
+Fetch random article summary:
+.nf
+$ wikis --random
+.fi
+.SH EXIT STATUS
+Returns 0 on success. Non-zero indicates errors such as no topic found, network errors,
+or invalid input.
+.SH AUTHOR
+Developed by \fIinevitable-commit\fR.
+Project URL: \fIhttps://github.com/inevitable-commit/wikis\fR
+.SH LICENSE
+MIT License.
+
+.SH BUGS
+The program is most likely to have bugs, as there are many Wikipedia pages that behave differently, such as \fIhttps://en.wikipedia.org/wiki/Special:RandomInCategory\fR. So, report bugs at \fIhttps://github.com/inevitable-commit/wikis/issues\fR

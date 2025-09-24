@@ -163,15 +163,15 @@ pub struct TopicSelectorTerminal {
 }
 
 impl TopicSelector for TopicSelectorTerminal {
-    fn select(&self, topics: &[String]) -> Option<usize> {
+    fn select(&self, titles: &[String]) -> Option<usize> {
         if self.show_prompt_text {
             print!("Topics:\n");
-            topics
+            titles
                 .iter()
                 .enumerate()
                 .for_each(|(i, topic)| print!("{:>2}: {}\n", i + 1, topic));
 
-            print!("Select a topic (Default: \"{}\"): ", topics[0]);
+            print!("Select a topic (Default: \"{}\"): ", titles[0]);
         }
 
         io::stdout().flush().expect("How does flushin stdout fail?");
@@ -189,7 +189,7 @@ impl TopicSelector for TopicSelectorTerminal {
                 .trim()
                 .parse::<i32>()
                 .expect("Error parsing the input");
-            if choice > 0 && choice <= topics.len() as i32 {
+            if choice > 0 && choice <= titles.len() as i32 {
                 Some(choice as usize - 1)
             } else {
                 eprintln!("Index out of bound");
